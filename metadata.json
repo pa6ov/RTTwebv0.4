@@ -1,0 +1,5 @@
+{
+  "name": "RTT – RoadToTrading v0.4",
+  "description": "Helps traders to get decisions about their daily trading by analyzing candlestick chart images.",
+  "requestFramePermissions": []
+}

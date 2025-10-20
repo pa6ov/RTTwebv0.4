@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RTT – RoadToTrading</title>
+  <link rel="stylesheet" href="index.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai@^0.12.0"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>> RTT – RoadToTrading_</h1>
+  </header>
+  <main>
+    <div id="upload-container">
+      <p>> Select chart image to analyze...</p>
+      <input type="file" id="image-picker" accept="image/*" aria-label="Image file input">
+      <label for="image-picker" class="button" role="button" aria-label="Select image file">Select File</label>
+      <button id="analyze-button" class="button" disabled>Analyze</button>
+    </div>
+    <div id="preview-container" class="hidden">
+      <img id="image-preview" src="#" alt="Image preview" />
+    </div>
+    <div id="loader" class="hidden" role="status" aria-label="Analyzing">
+      <p>> Analyzing chart...</p>
+      <div class="spinner"></div>
+    </div>
+    <div id="result-container" class="hidden" aria-live="polite">
+      <h2>> Analysis Result_</h2>
+      <pre id="result"></pre>
+    </div>
+    <div id="error-container" class="hidden" role="alert">
+        <h2>> Error_</h2>
+        <p id="error-message"></p>
+    </div>
+  </main>
+  <script type="module" src="index.tsx"></script>
+</body>
+</html>
