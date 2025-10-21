@@ -145,17 +145,49 @@ input[type="file"] {
 /* Responsive design */
 @media (max-width: 600px) {
   body {
-    padding: 0.5rem;
+    padding: 1rem;
+    font-size: 16px; /* Ensure readability on smaller screens */
   }
+
   main {
     padding: 0.5rem;
+    border: none;
+    box-shadow: none;
+    margin-top: 0;
   }
+
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.25rem;
   }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  #upload-container p {
+    margin-bottom: 1.5rem;
+  }
+
   .button {
     display: block;
-    width: calc(100% - 1rem);
-    margin: 0.5rem auto;
+    width: 90%;
+    margin: 1rem auto;
+    padding: 15px 10px; /* Taller buttons for easier tapping */
+    font-size: 1.1rem;
+  }
+
+  #image-preview {
+    max-height: 300px; /* Reduce max height to fit better on portrait screens */
+  }
+
+  #result-container, #error-container {
+    margin-top: 1.5rem;
+  }
+
+  #result {
+    padding: 0.8rem;
+    font-size: 0.9rem; /* Slightly smaller text in result to fit more content */
   }
 }
