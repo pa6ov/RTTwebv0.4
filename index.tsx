@@ -90,8 +90,8 @@ analyzeButton.addEventListener('click', async () => {
       - profitProbability: A typical success rate or probability percentage range for the pattern if available in your knowledge base (e.g., "55-72%"). If not available, state "Not available".
       - takeProfitLevel: A suggested price level or strategy for taking profit based on the pattern (e.g., "$150.25").
       - stopLossLevel: A suggested price level or strategy for a stop loss order based on the pattern (e.g., "$145.50").
-      - takeProfitLineY: The y-pixel coordinate on the image for a horizontal "Take Profit" line. The image's top edge is y=0.
-      - stopLossLineY: The y-pixel coordinate on the image for a horizontal "Stop Loss" line.
+      - takeProfitLineY: The y-pixel coordinate on the image for a horizontal "Take Profit" line. For a bullish "Buy" signal, this line must be above the current price/pattern. For a bearish "Sell" signal, it must be below. The image's top edge is y=0.
+      - stopLossLineY: The y-pixel coordinate on the image for a horizontal "Stop Loss" line. For a bullish "Buy" signal, this line must be below the current price/pattern. For a bearish "Sell" signal, it must be above.
       - tradingAdvice: A brief, step-by-step guide on how to trade this pattern.
       - summary: A concise summary of the pattern and its implications.
 
@@ -120,7 +120,7 @@ analyzeButton.addEventListener('click', async () => {
             tradingAdvice: { type: Type.STRING },
             summary: { type: Type.STRING },
           },
-          required: ["patternName", "signal", "profitProbability", "takeProfitLevel", "stopLossLevel", "tradingAdvice", "summary"]
+          required: ["patternName", "signal", "profitProbability", "takeProfitLevel", "stopLossLevel", "takeProfitLineY", "stopLossLineY", "tradingAdvice", "summary"]
         },
       }
     });
@@ -133,42 +133,79 @@ analyzeButton.addEventListener('click', async () => {
       // Clear previous drawings
       ctx.clearRect(0, 0, analysisCanvas.width, analysisCanvas.height);
       
-      // The model gives coordinates based on the original image dimensions.
-      // We need to scale them to the displayed image dimensions.
       const scaleY = imagePreview.offsetHeight / imagePreview.naturalHeight;
-
-      // Draw Take Profit line
+      const signal = parsedJson.signal;
+      const canvasWidth = analysisCanvas.width;
+      const canvasHeight = analysisCanvas.height;
+    
+      // --- Draw Take Profit ---
       if (typeof parsedJson.takeProfitLineY === 'number') {
         const y = parsedJson.takeProfitLineY * scaleY;
+        const level = parsedJson.takeProfitLevel;
+        const arrow = signal === 'Buy' ? '▲' : '▼';
+        const label = `${arrow} Take Profit: ${level}`;
+    
+        // Shaded Zone
+        ctx.fillStyle = 'rgba(0, 255, 0, 0.15)';
+        if (signal === 'Buy') {
+          ctx.fillRect(0, 0, canvasWidth, y);
+        } else { // Sell or Neutral
+          ctx.fillRect(0, y, canvasWidth, canvasHeight - y);
+        }
+        
+        // Dashed Line
         ctx.beginPath();
         ctx.strokeStyle = 'rgba(0, 255, 0, 0.9)';
         ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]); // Dashed line
+        ctx.setLineDash([5, 5]);
         ctx.moveTo(0, y);
-        ctx.lineTo(analysisCanvas.width, y);
+        ctx.lineTo(canvasWidth, y);
         ctx.stroke();
-
-        ctx.fillStyle = 'rgba(0, 255, 0, 1)';
+        ctx.setLineDash([]); // Reset line dash
+    
+        // Label with background
         ctx.font = 'bold 14px "Courier New", Courier, monospace';
         ctx.textAlign = 'left';
-        ctx.fillText(`Take Profit: ${parsedJson.takeProfitLevel}`, 5, y - 6);
+        const textMetrics = ctx.measureText(label);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(2, y - 20, textMetrics.width + 6, 18);
+        ctx.fillStyle = 'rgba(0, 255, 0, 1)';
+        ctx.fillText(label, 5, y - 6);
       }
-
-      // Draw Stop Loss line
+    
+      // --- Draw Stop Loss ---
       if (typeof parsedJson.stopLossLineY === 'number') {
         const y = parsedJson.stopLossLineY * scaleY;
+        const level = parsedJson.stopLossLevel;
+        const arrow = signal === 'Buy' ? '▼' : '▲';
+        const label = `${arrow} Stop Loss: ${level}`;
+        
+        // Shaded Zone
+        ctx.fillStyle = 'rgba(255, 77, 77, 0.15)';
+         if (signal === 'Buy') {
+          ctx.fillRect(0, y, canvasWidth, canvasHeight - y);
+        } else { // Sell or Neutral
+          ctx.fillRect(0, 0, canvasWidth, y);
+        }
+    
+        // Dashed Line
         ctx.beginPath();
         ctx.strokeStyle = 'rgba(255, 77, 77, 0.9)';
         ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]); // Dashed line
+        ctx.setLineDash([5, 5]);
         ctx.moveTo(0, y);
-        ctx.lineTo(analysisCanvas.width, y);
+        ctx.lineTo(canvasWidth, y);
         ctx.stroke();
-
-        ctx.fillStyle = 'rgba(255, 77, 77, 1)';
+        ctx.setLineDash([]); // Reset line dash
+    
+        // Label with background
         ctx.font = 'bold 14px "Courier New", Courier, monospace';
         ctx.textAlign = 'left';
-        ctx.fillText(`Stop Loss: ${parsedJson.stopLossLevel}`, 5, y + 18); // Draw below the line
+        const textMetrics = ctx.measureText(label);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(2, y + 4, textMetrics.width + 6, 18);
+        ctx.fillStyle = 'rgba(255, 77, 77, 1)';
+        ctx.fillText(label, 5, y + 18);
       }
     }
 
