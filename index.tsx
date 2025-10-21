@@ -173,13 +173,13 @@ analyzeButton.addEventListener('click', async () => {
     }
 
     // Format output
-    const formattedResult = `**Pattern Identified**: ${parsedJson.patternName}
-**Signal**: ${parsedJson.signal}
-**Profit Probability**: ${parsedJson.profitProbability}
-**Take Profit**: ${parsedJson.takeProfitLevel}
-**Stop Loss**: ${parsedJson.stopLossLevel}
-**Trading Advice**: ${parsedJson.tradingAdvice}
-**Summary**: ${parsedJson.summary}`;
+    const formattedResult = `Pattern Identified: ${parsedJson.patternName}
+Signal: ${parsedJson.signal}
+Profit Probability: ${parsedJson.profitProbability}
+Take Profit: ${parsedJson.takeProfitLevel}
+Stop Loss: ${parsedJson.stopLossLevel}
+Trading Advice: ${parsedJson.tradingAdvice}
+Summary: ${parsedJson.summary}`;
 
     resultEl.textContent = formattedResult.trim();
     resultContainer.classList.remove('hidden');
