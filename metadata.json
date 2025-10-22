@@ -1,5 +1,5 @@
 {
-  "name": "RTT – RoadToTrading v0.4",
-  "description": "Helps traders to get decisions about their daily trading by analyzing candlestick chart images.",
+  "name": "RTT – RoadToTrading 0.5",
+  "description": "A multi-page website featuring an AI-powered tool that helps traders analyze candlestick chart images for patterns and insights.",
   "requestFramePermissions": []
 }

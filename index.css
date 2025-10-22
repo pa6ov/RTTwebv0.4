@@ -4,6 +4,9 @@
   --text-color: #00ff00;
   --border-color: #00ff00;
   --error-color: #ff4d4d;
+  --link-hover-bg: #00ff00;
+  --link-hover-text: #0d0d0d;
+  --secondary-text-color: #aaa;
 }
 
 body {
@@ -12,6 +15,9 @@ body {
   font-family: 'Courier New', Courier, monospace;
   margin: 0;
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 h1, h2 {
@@ -33,26 +39,126 @@ h1::after, h2::after {
 
 main {
   max-width: 800px;
+  width: 100%;
   margin: 0 auto;
   padding: 1rem;
   border: 1px solid var(--border-color);
   box-shadow: 0 0 10px var(--border-color);
+  flex-grow: 1;
+  box-sizing: border-box;
 }
 
 .hidden {
   display: none;
 }
 
-/* Header */
-header {
+/* Header, Nav & Footer */
+header, footer {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
   text-align: center;
+}
+
+header {
   margin-bottom: 2rem;
+}
+
+footer {
+  margin-top: 2rem;
+  padding: 1rem 0;
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
+  border-top: 1px solid #333;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  border: 1px solid #333;
+  padding: 0.5rem;
+}
+
+nav a {
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+nav a:hover, nav a.active {
+  background-color: var(--link-hover-bg);
+  color: var(--link-hover-text);
+  text-shadow: none;
+  box-shadow: 0 0 5px var(--text-color);
+}
+
+/* Content Pages (About, Contact) */
+.content-page {
+  text-align: left;
+}
+
+.content-page p {
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.content-page a {
+  color: var(--text-color);
+  text-decoration: underline;
+}
+
+.content-page a:hover {
+  text-shadow: 0 0 5px var(--text-color);
+}
+
+.contact-list {
+  list-style: '> ';
+  padding-left: 1.5rem;
+}
+
+.contact-list li {
+  margin-bottom: 1rem;
+}
+
+.contact-list span {
+  font-weight: bold;
 }
 
 /* Upload container */
 #upload-container {
   text-align: center;
   margin-bottom: 1.5rem;
+}
+
+#upload-container p {
+  margin-bottom: 1rem;
+}
+
+#image-description {
+  width: 100%;
+  background-color: #111;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  font-family: inherit;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+#image-description::placeholder {
+  color: #555;
+}
+
+#image-description:focus {
+  outline: none;
+  box-shadow: 0 0 10px var(--text-color);
 }
 
 input[type="file"] {
@@ -85,17 +191,17 @@ input[type="file"] {
 
 /* Image preview */
 #preview-container {
-  position: relative; /* Positioning context for the canvas */
-  width: fit-content; /* Shrink-wrap the container to the image size */
-  margin: 1.5rem auto; /* Center the container */
-  line-height: 0; /* Remove extra space from line height */
+  position: relative;
+  width: fit-content;
+  margin: 1.5rem auto;
+  line-height: 0;
 }
 
 #image-preview {
   max-width: 100%;
   max-height: 400px;
   border: 1px solid var(--border-color);
-  display: block; /* Removes bottom space under the image */
+  display: block;
 }
 
 #analysis-canvas {
@@ -104,7 +210,7 @@ input[type="file"] {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* Allows clicks to pass through the canvas */
+  pointer-events: none;
 }
 
 
@@ -158,8 +264,8 @@ input[type="file"] {
 /* Responsive design */
 @media (max-width: 600px) {
   body {
-    padding: 1rem;
-    font-size: 16px; /* Ensure readability on smaller screens */
+    padding: 0.5rem;
+    font-size: 16px;
   }
 
   main {
@@ -170,37 +276,27 @@ input[type="file"] {
   }
 
   h1 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.25rem;
+    font-size: 1.5rem;
   }
 
   h2 {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
 
-  #upload-container p {
-    margin-bottom: 1.5rem;
+  nav ul {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .button {
     display: block;
     width: 90%;
     margin: 1rem auto;
-    padding: 15px 10px; /* Taller buttons for easier tapping */
+    padding: 15px 10px;
     font-size: 1.1rem;
   }
 
   #image-preview {
-    max-height: 300px; /* Reduce max height to fit better on portrait screens */
-  }
-
-  #result-container, #error-container {
-    margin-top: 1.5rem;
-  }
-
-  #result {
-    padding: 0.8rem;
-    font-size: 0.9rem; /* Slightly smaller text in result to fit more content */
+    max-height: 300px;
   }
 }

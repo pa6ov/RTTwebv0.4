@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>RTT – RoadToTrading</title>
+  <title>RTT – Trading Tool</title>
   <link rel="stylesheet" href="index.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script type="importmap">
@@ -15,10 +15,18 @@
 <body>
   <header>
     <h1> RTT – RoadToTrading</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html" class="active">Tool</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
   </header>
   <main>
     <div id="upload-container">
-      <p> Select chart image to analyze...</p>
+      <p>Select chart image to analyze, or paste it from the clipboard.</p>
+      <textarea id="image-description" placeholder="Add any additional context for the image (optional)..." rows="3" aria-label="Additional image description"></textarea>
       <input type="file" id="image-picker" accept="image/*" aria-label="Image file input">
       <label for="image-picker" class="button" role="button" aria-label="Select image file">Select File</label>
       <button id="analyze-button" class="button" disabled>Analyze</button>
@@ -40,6 +48,9 @@
         <p id="error-message"></p>
     </div>
   </main>
+  <footer>
+    <p>&copy; 2024 RoadToTrading. All rights reserved.</p>
+  </footer>
   <script type="module" src="index.tsx"></script>
 </body>
 </html>

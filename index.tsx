@@ -6,6 +6,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 // UI Elements
 const imagePicker = document.getElementById('image-picker') as HTMLInputElement;
+const imageDescription = document.getElementById('image-description') as HTMLTextAreaElement;
 const analyzeButton = document.getElementById('analyze-button') as HTMLButtonElement;
 const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
 const analysisCanvas = document.getElementById('analysis-canvas') as HTMLCanvasElement;
@@ -37,9 +38,8 @@ function fileToGenerativePart(file: File): Promise<{mimeType: string, data: stri
   });
 }
 
-// Event Listeners
-imagePicker.addEventListener('change', async (event) => {
-  const file = (event.target as HTMLInputElement).files?.[0];
+// Handles the selected image file (from picker or clipboard)
+async function handleImageFile(file: File | null) {
   if (!file) {
     return;
   }
@@ -65,6 +65,30 @@ imagePicker.addEventListener('change', async (event) => {
   
   // Enable button
   analyzeButton.disabled = false;
+}
+
+
+// Event Listeners
+imagePicker.addEventListener('change', (event) => {
+  const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+  handleImageFile(file);
+});
+
+document.addEventListener('paste', async (event: ClipboardEvent) => {
+  const items = event.clipboardData?.items;
+  if (!items) return;
+
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type.indexOf('image') !== -1) {
+      const file = items[i].getAsFile();
+      if (file) {
+        // Prevent browser's default paste action
+        event.preventDefault();
+        await handleImageFile(file);
+        break; // Stop after handling the first image
+      }
+    }
+  }
 });
 
 analyzeButton.addEventListener('click', async () => {
@@ -79,8 +103,9 @@ analyzeButton.addEventListener('click', async () => {
   analyzeButton.disabled = true;
 
   try {
-    const textPart = {
-      text: `You are a professional trading analyst specializing in Japanese candlestick patterns. Your task is to analyze an image of a candlestick chart and identify the primary candlestick pattern present.
+    const userDescription = imageDescription.value.trim();
+    
+    let promptText = `You are a professional trading analyst specializing in Japanese candlestick patterns. Your task is to analyze an image of a candlestick chart and identify the primary candlestick pattern present.
       
       Your analysis should be based on common knowledge of the 50 best candlestick patterns.
       
@@ -95,8 +120,13 @@ analyzeButton.addEventListener('click', async () => {
       - tradingAdvice: A brief, step-by-step guide on how to trade this pattern.
       - summary: A concise summary of the pattern and its implications.
 
-      Analyze the provided chart image and return ONLY the JSON object conforming to the specified schema. The coordinates must be scaled to the original image dimensions.`,
-    };
+      Analyze the provided chart image and return ONLY the JSON object conforming to the specified schema. The coordinates must be scaled to the original image dimensions.`;
+
+    if (userDescription) {
+      promptText = `User-provided context: "${userDescription}"\n\n${promptText}`;
+    }
+
+    const textPart = { text: promptText };
 
     const imagePart = {
       inlineData: selectedImage
