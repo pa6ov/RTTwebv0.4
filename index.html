@@ -14,42 +14,45 @@
 </head>
 <body>
   <header>
-    <h1> RTT – RoadToTrading</h1>
-    <nav>
-      <ul>
-        <li><a href="index.html" class="active">Tool</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-    </nav>
+    <h1 data-translate-key="rtt-title"> RTT – RoadToTrading</h1>
+    <div class="header-controls">
+      <nav>
+        <ul>
+          <li><a href="index.html" class="active" data-translate-key="nav-tool">Tool</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+      <button id="lang-switcher" class="button">BG</button>
+    </div>
   </header>
   <main>
     <div id="upload-container">
-      <p>Select chart image to analyze, or paste it from the clipboard.</p>
-      <textarea id="image-description" placeholder="Add any additional context for the image (optional)..." rows="3" aria-label="Additional image description"></textarea>
+      <p data-translate-key="upload-instructions">Select chart image to analyze, or paste it from the clipboard.</p>
+      <textarea id="image-description" placeholder="Add any additional context for the image (optional)..." rows="3" aria-label="Additional image description" data-translate-key="image-description-placeholder" data-translate-type="placeholder"></textarea>
       <input type="file" id="image-picker" accept="image/*" aria-label="Image file input">
-      <label for="image-picker" class="button" role="button" aria-label="Select image file">Select File</label>
-      <button id="analyze-button" class="button" disabled>Analyze</button>
+      <label for="image-picker" class="button" role="button" aria-label="Select image file" data-translate-key="select-file-btn">Select File</label>
+      <button id="analyze-button" class="button" disabled data-translate-key="analyze-btn">Analyze</button>
     </div>
     <div id="preview-container" class="hidden">
       <img id="image-preview" src="#" alt="Image preview" />
       <canvas id="analysis-canvas"></canvas>
     </div>
     <div id="loader" class="hidden" role="status" aria-label="Analyzing">
-      <p>Analyzing chart...</p>
+      <p data-translate-key="loader-text">Analyzing chart...</p>
       <div class="spinner"></div>
     </div>
     <div id="result-container" class="hidden" aria-live="polite">
-      <h2>> Analysis Result_</h2>
-      <pre id="result"></pre>
+      <h2 data-translate-key="result-title">> Analysis Result_</h2>
+      <div id="result"></div>
     </div>
     <div id="error-container" class="hidden" role="alert">
-        <h2>> Error</h2>
+        <h2 data-translate-key="error-title">> Error</h2>
         <p id="error-message"></p>
     </div>
   </main>
   <footer>
-    <p>&copy; 2024 RoadToTrading. All rights reserved.</p>
+    <p data-translate-key="footer-text">&copy; 2024 RoadToTrading. All rights reserved.</p>
   </footer>
   <script type="module" src="index.tsx"></script>
 </body>

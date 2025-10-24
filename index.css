@@ -60,6 +60,20 @@ header, footer {
   text-align: center;
 }
 
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+#lang-switcher {
+  padding: 0.5rem 1rem;
+  margin: 0;
+  flex-shrink: 0;
+}
+
 header {
   margin-bottom: 2rem;
 }
@@ -75,12 +89,13 @@ footer {
 nav ul {
   list-style: none;
   padding: 0;
-  margin: 1rem 0 0 0;
+  margin: 0;
   display: flex;
   justify-content: center;
   gap: 1rem;
   border: 1px solid #333;
   padding: 0.5rem;
+  flex-grow: 1;
 }
 
 nav a {
@@ -241,12 +256,51 @@ input[type="file"] {
 }
 
 #result {
-  white-space: pre-wrap;
-  word-wrap: break-word;
   background-color: #111;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   border: 1px solid #333;
 }
+
+.result-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed #333;
+  line-height: 1.6;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-label {
+  font-weight: bold;
+  color: #7f7;
+}
+
+.result-value {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.sources-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.sources-list li {
+  margin-bottom: 0.25rem;
+}
+
+.sources-list a {
+  color: var(--text-color);
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+.sources-list a:hover {
+  text-shadow: 0 0 5px var(--text-color);
+}
+
 
 /* Error container */
 #error-container {
@@ -266,6 +320,11 @@ input[type="file"] {
   body {
     padding: 0.5rem;
     font-size: 16px;
+  }
+  
+  .header-controls {
+    flex-direction: column;
+    align-items: center;
   }
 
   main {
