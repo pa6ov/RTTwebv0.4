@@ -7,6 +7,12 @@ import { translations } from './translations';
 import { getState, setState } from './state';
 
 /**
+ * The currently active object URL for the image preview.
+ * Used to release memory when a new image is selected.
+ */
+let currentObjectUrl: string | null = null;
+
+/**
  * A collection of all DOM elements used in the application.
  */
 export const elements = {
@@ -109,14 +115,21 @@ export function setLanguage(lang: 'en' | 'bg') {
  * @param {File} file The image file to preview.
  */
 export function updateImagePreview(file: File) {
-    elements.imagePreview.src = URL.createObjectURL(file);
-    elements.previewContainer.classList.remove('hidden');
+    // Revoke the old object URL to avoid memory leaks.
+    if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+    }
 
+    currentObjectUrl = URL.createObjectURL(file);
+
+    // Set the onload handler before setting the src to avoid a race condition.
     elements.imagePreview.onload = () => {
         elements.analysisCanvas.width = elements.imagePreview.offsetWidth;
         elements.analysisCanvas.height = elements.imagePreview.offsetHeight;
-        URL.revokeObjectURL(elements.imagePreview.src); // Clean up memory
     };
+    
+    elements.imagePreview.src = currentObjectUrl;
+    elements.previewContainer.classList.remove('hidden');
 }
 
 /**

@@ -14,14 +14,25 @@ export function fileToGenerativePart(file: File): Promise<{mimeType: string, dat
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
-      // The result includes the full data URL, so we split to get only the base64 part
-      const base64Data = (reader.result as string).split(',')[1];
+      const result = reader.result as string;
+      if (!result || !result.startsWith('data:')) {
+          reject(new Error('Invalid file format or failed to read file as data URL.'));
+          return;
+      }
+      
+      const parts = result.split(',');
+      if (parts.length < 2 || !parts[1]) {
+          reject(new Error('Could not extract base64 data from file. The file might be empty or corrupt.'));
+          return;
+      }
+
+      const base64Data = parts[1];
       resolve({
         mimeType: file.type,
         data: base64Data
       });
     };
-    reader.onerror = (err) => reject(err);
+    reader.onerror = () => reject(new Error(`Error reading file: ${reader.error?.message || 'Unknown error'}`));
     reader.readAsDataURL(file);
   });
 }
@@ -39,13 +50,21 @@ export async function getPrompt(): Promise<string> {
     try {
         const response = await fetch('prompt.txt');
         if (!response.ok) {
-            throw new Error(`Failed to fetch prompt.txt: ${response.statusText}`);
+            throw new Error(`Failed to fetch prompt.txt: Server responded with status ${response.status} ${response.statusText}`);
         }
         const text = await response.text();
+        if (!text) {
+            throw new Error("The prompt.txt file is empty.");
+        }
         setState({ cachedPrompt: text });
         return text;
     } catch (error) {
-        console.error(error);
-        throw new Error("Could not load the analysis prompt. Please check prompt.txt exists and the network connection.");
+        console.error("Error fetching prompt:", error);
+        let message = "Could not load the analysis prompt. Please check your network connection and ensure 'prompt.txt' exists and is not empty.";
+        if (error instanceof Error) {
+            // Append original error message for better debugging context
+            message += `\nOriginal error: ${error.message}`;
+        }
+        throw new Error(message);
     }
 }
