@@ -5,8 +5,8 @@
 import { GoogleGenAI } from "@google/genai";
 
 /**
- * Logger class for creating structured XML logs in the browser console.
- * This is a client-side logger; it does not write to the server file system.
+ * Logger class for creating structured XML logs.
+ * This logger sends logs to a server endpoint and also logs to the browser console.
  */
 class Logger {
     private escapeXml(unsafe: string): string {
@@ -22,7 +22,7 @@ class Logger {
         });
     }
 
-    public log(event: string, type: 'INFO' | 'SUCCESS' | 'ERROR' | 'PROMPT', details?: any) {
+    public async log(event: string, type: 'INFO' | 'SUCCESS' | 'ERROR' | 'PROMPT', details?: any) {
         const timestamp = new Date().toISOString();
         
         let detailsXml = '';
@@ -36,9 +36,22 @@ class Logger {
   <event>${this.escapeXml(event)}</event>
   ${detailsXml}
 </log>
-        `;
+        `.trim();
 
-        console.log(logEntry.trim());
+        // Also log to console for development/debugging purposes
+        console.log(logEntry);
+
+        // NOTE: This requires a server-side endpoint at '/log' that accepts POST requests
+        // with an XML body and writes it to a file. This is a front-end only implementation.
+        try {
+            await fetch('/log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/xml' },
+                body: logEntry
+            });
+        } catch (error) {
+            console.error('Logger: Failed to send log to server:', error);
+        }
     }
 }
 
@@ -244,7 +257,7 @@ async function handleImageFile(file: File | null) {
     return;
   }
 
-  logger.log('Image selected', 'INFO', {
+  await logger.log('Image selected', 'INFO', {
     name: file.name,
     type: file.type,
     size: file.size,
@@ -303,12 +316,32 @@ document.addEventListener('paste', async (event: ClipboardEvent) => {
   }
 });
 
+let cachedPrompt: string | null = null;
+async function getPrompt(): Promise<string> {
+    if (cachedPrompt) {
+        return cachedPrompt;
+    }
+    try {
+        const response = await fetch('prompt.txt');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch prompt.txt: ${response.statusText}`);
+        }
+        const text = await response.text();
+        cachedPrompt = text;
+        return text;
+    } catch (error) {
+        console.error(error);
+        throw new Error("Could not load the analysis prompt. Please check prompt.txt exists and the network connection.");
+    }
+}
+
+
 analyzeButton.addEventListener('click', async () => {
   if (!selectedImage) {
     return;
   }
 
-  logger.log('Analysis execution started', 'INFO');
+  await logger.log('Analysis execution started', 'INFO');
 
   // Reset UI
   loader.classList.remove('hidden');
@@ -318,37 +351,10 @@ analyzeButton.addEventListener('click', async () => {
   analysisDataStore = null;
 
   try {
+    const basePrompt = await getPrompt();
     const userDescription = imageDescription.value.trim();
     
-    let promptText = `You are a professional trading analyst specializing in technical and fundamental analysis. Your task is to analyze an image of a candlestick chart.
-
-**Part 1: Technical Analysis (Visual)**
-- Based on expert knowledge from resources like "The Ultimate Candlestick Patterns PDF" and "The Candlestick Trading Bible", identify the primary candlestick pattern in the provided image.
-- Suggest 2-3 additional technical indicators (e.g., RSI, MACD, Moving Averages) that could confirm the identified pattern's signal. Briefly explain why each would be useful for this pattern.
-
-**Part 2: Fundamental Analysis (News)**
-- Identify the stock/crypto symbol from the image or from the user-provided context.
-- Use Google Search to find relevant, recent news (from the last 48 hours) about this asset.
-- Analyze the sentiment of the news (positive, negative, neutral).
-
-**Part 3: Synthesize and Output**
-- Combine your visual technical analysis and fundamental news analysis to provide a comprehensive trading recommendation.
-- The news sentiment should adjust the profit probability and trading advice.
-- Provide your complete analysis in a single, raw JSON object. **Do not wrap it in markdown backticks or add any other text before or after the JSON.**
-
-The JSON object must have the following structure. For fields requiring translation, provide an object with "en" and "bg" keys.
-
-- patternName: {"en": "English Pattern Name", "bg": "Bulgarian Pattern Name"}
-- signal: {"en": "Buy" | "Sell" | "Neutral", "bg": "Купува" | "Продава" | "Неутрален"}
-- profitProbability: A success rate percentage range (e.g., "55-72%"). This is a string and does not need translation.
-- confirmationIndicators: {"en": "English indicator advice", "bg": "Bulgarian indicator advice"}
-- takeProfitLevel: Suggested take profit price (string, no translation).
-- stopLossLevel: Suggested stop loss price (string, no translation).
-- takeProfitTimeframe: Suggested timeframe (e.g., "30-60 minutes") (string, no translation).
-- tradingAdvice: {"en": "English trading advice", "bg": "Bulgarian trading advice"}
-- summary: {"en": "English summary", "bg": "Bulgarian summary"}
-
-Analyze the provided chart image and return ONLY the raw JSON object string. Ensure the specified fields are translated into both English and Bulgarian as shown in the structure above.`;
+    let promptText = basePrompt;
 
     if (userDescription) {
       promptText = `User-provided context: "${userDescription}"\n\n${promptText}`;
@@ -360,7 +366,7 @@ Analyze the provided chart image and return ONLY the raw JSON object string. Ens
       inlineData: selectedImage
     };
 
-    logger.log('Sending prompt to Gemini model', 'PROMPT', { prompt: promptText });
+    await logger.log('Sending prompt to Gemini model', 'PROMPT', { prompt: promptText });
     
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -372,7 +378,7 @@ Analyze the provided chart image and return ONLY the raw JSON object string. Ens
 
     let jsonString = response.text;
 
-    logger.log('Analysis executed successfully', 'SUCCESS', {
+    await logger.log('Analysis executed successfully', 'SUCCESS', {
       returnedCode: '200_OK',
       output: jsonString,
     });
@@ -407,7 +413,7 @@ Analyze the provided chart image and return ONLY the raw JSON object string. Ens
             errorCode = 'INVALID_JSON_RESPONSE';
         }
     }
-    logger.log('Analysis execution failed', 'ERROR', {
+    await logger.log('Analysis execution failed', 'ERROR', {
       returnedCode: errorCode,
       error: e.toString(),
       stack: e instanceof Error ? e.stack : 'N/A',
