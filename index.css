@@ -155,6 +155,13 @@ nav a:hover, nav a.active {
   margin-bottom: 1rem;
 }
 
+.app-focus-note {
+  font-size: 0.9rem;
+  color: var(--secondary-text-color);
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+}
+
 #image-description {
   width: 100%;
   background-color: #111;
