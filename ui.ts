@@ -28,6 +28,7 @@ export const elements = {
     errorContainer: document.getElementById('error-container') as HTMLDivElement,
     errorMessageEl: document.getElementById('error-message') as HTMLParagraphElement,
     langSwitcher: document.getElementById('lang-switcher') as HTMLButtonElement,
+    shareButton: document.getElementById('share-button') as HTMLButtonElement,
 };
 
 /**
@@ -40,6 +41,8 @@ export function displayAnalysis() {
     if (!analysisData) {
         return;
     }
+
+    elements.shareButton.classList.remove('hidden');
 
     const { json: parsedJson, groundingSources } = analysisData;
 
@@ -148,7 +151,10 @@ export function resetUIForNewAnalysis() {
 export const showLoader = () => elements.loader.classList.remove('hidden');
 export const hideLoader = () => elements.loader.classList.add('hidden');
 export const showResults = () => elements.resultContainer.classList.remove('hidden');
-export const hideResults = () => elements.resultContainer.classList.add('hidden');
+export const hideResults = () => {
+    elements.resultContainer.classList.add('hidden');
+    elements.shareButton.classList.add('hidden');
+};
 
 export function showError(message: string) {
     elements.errorMessageEl.textContent = message;

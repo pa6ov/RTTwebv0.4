@@ -110,6 +110,75 @@ async function performAnalysis() {
     }
 }
 
+/**
+ * Handles sharing the analysis result via Web Share API or clipboard.
+ */
+async function handleShare() {
+    const { analysisData, currentLanguage } = getState();
+    if (!analysisData) return;
+  
+    const { json: parsedJson } = analysisData;
+  
+    const getValue = (key: string, translatable: boolean) => {
+        if (!parsedJson || typeof parsedJson !== 'object' || !parsedJson[key]) return '';
+        if (translatable) {
+            return parsedJson[key][currentLanguage] || parsedJson[key]['en'] || '';
+        }
+        return parsedJson[key] || '';
+    };
+    
+    const t = translations[currentLanguage];
+  
+    const shareText = `
+${t['result-title'].replace('>', '').replace('_', '').trim()}
+- ${t['pattern']}: ${getValue('patternName', true)}
+- ${t['signal']}: ${getValue('signal', true)}
+- ${t['profit-prob']}: ${getValue('profitProbability', false)}
+- ${t['take-profit']}: ${getValue('takeProfitLevel', false)}
+- ${t['stop-loss']}: ${getValue('stopLossLevel', false)}
+- ${t['summary']}: ${getValue('summary', true)}
+    `.trim().replace(/^\s+/gm, '');
+    
+    const shareData = {
+        title: `${t['rtt-title']} - ${t['result-title'].replace(/[>_]/g, '').trim()}`,
+        text: shareText,
+    };
+  
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+            await logger.log('Analysis shared via Web Share API', 'SUCCESS');
+        } catch (err) {
+            if (err instanceof Error && err.name !== 'AbortError') {
+                console.error('Error sharing:', err);
+                await logger.log('Web Share API failed', 'ERROR', { error: err.toString() });
+            }
+        }
+    } else {
+        try {
+            await navigator.clipboard.writeText(shareText);
+            const originalText = elements.shareButton.textContent;
+            const originalKey = elements.shareButton.getAttribute('data-translate-key');
+            
+            elements.shareButton.removeAttribute('data-translate-key');
+            elements.shareButton.textContent = t['copied-msg'];
+            elements.shareButton.disabled = true;
+            
+            setTimeout(() => {
+                if (originalKey) {
+                    elements.shareButton.setAttribute('data-translate-key', originalKey);
+                }
+                elements.shareButton.textContent = originalText;
+                elements.shareButton.disabled = false;
+            }, 2000);
+            await logger.log('Analysis copied to clipboard', 'SUCCESS');
+        } catch (err) {
+            console.error('Error copying to clipboard:', err);
+            await logger.log('Clipboard copy failed', 'ERROR', { error: err.toString() });
+            alert('Could not copy to clipboard.');
+        }
+    }
+}
 
 /**
  * Sets up all the application's event listeners.
@@ -142,6 +211,8 @@ function setupEventListeners() {
     });
 
     elements.analyzeButton.addEventListener('click', performAnalysis);
+
+    elements.shareButton.addEventListener('click', handleShare);
 }
 
 /**
