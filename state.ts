@@ -10,7 +10,6 @@ export type AppState = {
     selectedImage: { data: string; mimeType: string; } | null;
     currentLanguage: 'en' | 'bg';
     analysisData: { json: any; groundingSources: any[]; } | null;
-    cachedPrompt: string | null;
 };
 
 /**
@@ -20,7 +19,6 @@ const state: AppState = {
     selectedImage: null,
     currentLanguage: 'en',
     analysisData: null,
-    cachedPrompt: null,
 };
 
 /**
