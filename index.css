@@ -20,7 +20,20 @@ body {
   min-height: 100vh;
 }
 
-h1, .result-header {
+h1 {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.header-logo {
+  height: 40px;
+  width: 40px;
+  margin-right: 1rem;
+}
+
+.result-header {
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }

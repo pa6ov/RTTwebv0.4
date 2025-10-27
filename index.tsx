@@ -111,7 +111,7 @@ async function performAnalysis() {
 }
 
 /**
- * Handles sharing the analysis result via Web Share API or clipboard.
+ * Handles copying the analysis result to the clipboard.
  */
 async function handleShare() {
     const { analysisData, currentLanguage } = getState();
@@ -139,44 +139,27 @@ ${t['result-title'].replace('>', '').replace('_', '').trim()}
 - ${t['summary']}: ${getValue('summary', true)}
     `.trim().replace(/^\s+/gm, '');
     
-    const shareData = {
-        title: `${t['rtt-title']} - ${t['result-title'].replace(/[>_]/g, '').trim()}`,
-        text: shareText,
-    };
-  
-    if (navigator.share) {
-        try {
-            await navigator.share(shareData);
-            await logger.log('Analysis shared via Web Share API', 'SUCCESS');
-        } catch (err) {
-            if (err instanceof Error && err.name !== 'AbortError') {
-                console.error('Error sharing:', err);
-                await logger.log('Web Share API failed', 'ERROR', { error: err.toString() });
+    try {
+        await navigator.clipboard.writeText(shareText);
+        const originalText = elements.shareButton.textContent;
+        const originalKey = elements.shareButton.getAttribute('data-translate-key');
+        
+        elements.shareButton.removeAttribute('data-translate-key');
+        elements.shareButton.textContent = t['copied-msg'];
+        elements.shareButton.disabled = true;
+        
+        setTimeout(() => {
+            if (originalKey) {
+                elements.shareButton.setAttribute('data-translate-key', originalKey);
             }
-        }
-    } else {
-        try {
-            await navigator.clipboard.writeText(shareText);
-            const originalText = elements.shareButton.textContent;
-            const originalKey = elements.shareButton.getAttribute('data-translate-key');
-            
-            elements.shareButton.removeAttribute('data-translate-key');
-            elements.shareButton.textContent = t['copied-msg'];
-            elements.shareButton.disabled = true;
-            
-            setTimeout(() => {
-                if (originalKey) {
-                    elements.shareButton.setAttribute('data-translate-key', originalKey);
-                }
-                elements.shareButton.textContent = originalText;
-                elements.shareButton.disabled = false;
-            }, 2000);
-            await logger.log('Analysis copied to clipboard', 'SUCCESS');
-        } catch (err) {
-            console.error('Error copying to clipboard:', err);
-            await logger.log('Clipboard copy failed', 'ERROR', { error: err.toString() });
-            alert('Could not copy to clipboard.');
-        }
+            elements.shareButton.textContent = originalText;
+            elements.shareButton.disabled = false;
+        }, 2000);
+        await logger.log('Analysis copied to clipboard', 'SUCCESS');
+    } catch (err) {
+        console.error('Error copying to clipboard:', err);
+        await logger.log('Clipboard copy failed', 'ERROR', { error: err.toString() });
+        alert('Could not copy to clipboard.');
     }
 }
 
