@@ -58,7 +58,7 @@ async function performAnalysis() {
     setState({ analysisData: null });
 
     try {
-        const basePrompt = await getPrompt();
+        const basePrompt = getPrompt();
         const userDescription = elements.imageDescription.value.trim();
 
         await logger.log('Sending prompt to Gemini model', 'PROMPT', { prompt: basePrompt, userContext: userDescription });
