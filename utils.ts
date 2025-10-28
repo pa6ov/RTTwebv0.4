@@ -59,6 +59,8 @@ export function getPrompt(): string {
 - The \`takeProfitLevel\`, \`stopLossLevel\`, and \`takeProfitTimeframe\` (e.g., '15-60 minutes', '1-4 hours') must be appropriate for day trading or swing trading over a few days.
 - Provide your complete analysis in a single, raw JSON object. **Do not wrap it in markdown backticks or add any other text before or after the JSON.**
 
+**Translation Quality:** For all Bulgarian translations ("bg"), you **must** use precise and professional trading terminology. The translation should be of expert quality, as if written by a native Bulgarian financial analyst. Avoid literal translations and use common industry jargon where appropriate.
+
 The JSON object must have the following structure. For fields requiring translation, provide an object with "en" and "bg" keys.
 
 - patternName: {"en": "English Pattern Name", "bg": "Bulgarian Pattern Name"}
@@ -71,7 +73,7 @@ The JSON object must have the following structure. For fields requiring translat
 - tradingAdvice: {"en": "English trading advice", "bg": "Bulgarian trading advice"}
 - summary: {"en": "English summary", "bg": "Bulgarian summary"}
 
-Analyze the provided chart image and return ONLY the raw JSON object string. Ensure the specified fields are translated into both English and Bulgarian as shown in the structure above.`;
+Analyze the provided chart image and return ONLY the raw JSON object string.`;
 
     const jsonRules = `{
       "title": "Gemini Rule Cards for Candlestick Patterns",
