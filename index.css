@@ -1,10 +1,10 @@
 /* General styles */
 :root {
   --background-color: #0d0d0d;
-  --text-color: #00ff00;
-  --border-color: #00ff00;
+  --text-color: #ff0000;
+  --border-color: #ff0000;
   --error-color: #ff4d4d;
-  --link-hover-bg: #00ff00;
+  --link-hover-bg: #ff0000;
   --link-hover-text: #0d0d0d;
   --secondary-text-color: #aaa;
 }
@@ -265,7 +265,7 @@ input[type="file"] {
 }
 
 .spinner {
-  border: 4px solid rgba(0, 255, 0, 0.3);
+  border: 4px solid rgba(255, 0, 0, 0.3);
   border-radius: 50%;
   border-top: 4px solid var(--text-color);
   width: 40px;
@@ -308,7 +308,7 @@ input[type="file"] {
 
 .result-label {
   font-weight: bold;
-  color: #7f7;
+  color: #ff7f7f;
 }
 
 .result-value {
